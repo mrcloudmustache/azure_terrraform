@@ -6,7 +6,7 @@ parameters:
 
 
 stages:
-  - stages: build_${{ parameters.env }}
+  - stage: build_${{ parameters.env }}
     displayName: 'Terraform Build - ${{upper(parameters.app) upper(parameters.env) }}'
     condition: always()
     jobs:
@@ -15,4 +15,7 @@ stages:
       steps:
       - checkout: self
       - task: AzureKeyVault@2
-        inputs
+        inputs:
+          azureSubscription: 'ado_to_keyvault'
+          KeyVaultName: 'MCM-TF-Keys'
+          SecretsFilter: '*'
