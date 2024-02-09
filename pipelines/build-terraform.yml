@@ -7,11 +7,11 @@ parameters:
 
 stages:
   - stage: build_${{ parameters.env }}
-    displayName: 'Terraform Build - ${{upper(parameters.app) upper(parameters.env) }}'
+    displayName: 'Terraform Build - ${{upper(parameters.app) }} ${{ upper(parameters.env) }}'
     condition: always()
     jobs:
     - job: Build
-      displayName: 'Build - ${{upper(parameters.app) upper(parameters.env) }}'
+      displayName: 'Build - ${{upper(parameters.app) }} ${{ upper(parameters.env) }}'
       steps:
       - checkout: self
       - task: AzureKeyVault@2
