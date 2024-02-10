@@ -6,11 +6,11 @@ parameters:
 
 
 stages:
-  - stage: build_${{ parameters.env }}
-    displayName: 'Terraform Build - ${{upper(parameters.app) }} ${{ upper(parameters.env) }}'
+  - stage: TF INSTALL and PLAN
+    displayName: 'Terraform Plan'
     condition: always()
     jobs:
-    - job: Build
+    - job: Plan
       displayName: 'Build - ${{upper(parameters.app) }} ${{ upper(parameters.env) }}'
       steps:
       - checkout: self
@@ -40,6 +40,14 @@ stages:
           provider: 'azurerm'
           command: 'plan'
           environmentServiceNameAzureRM: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
+  - stage: TF APPLY
+    displayName: 'Terraform Apply'
+    condition: always()
+    jobs:
+    - job: Apply
+      displayName: 'Terraform Apply'
+      steps:
+      - checkout: self
       - task: TerraformTaskV4@4
         inputs:
           provider: 'azurerm'
