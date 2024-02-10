@@ -26,3 +26,12 @@ stages:
       - task: TerraformInstaller@1
         inputs:
           terraformVersion: 'latest'
+      - task: TerraformTaskV4@4
+        inputs:
+          provider: 'azurerm'
+          command: 'init'
+          backendServiceArm: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
+          backendAzureRmResourceGroupName: 'tfstate'
+          backendAzureRmStorageAccountName: 'tfstate2n08y'
+          backendAzureRmContainerName: 'tfstate'
+          backendAzureRmKey: 'terraform.tfstate'
