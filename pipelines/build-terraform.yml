@@ -6,8 +6,8 @@ parameters:
 
 
 stages:
-  - stage: Deploy TF
-    displayName: 'Deploying TF to PRD'
+  - stage: deploy_tf
+    displayName: 'Deploying TF'
     condition: always()
     jobs:
     - job: install_terraform
