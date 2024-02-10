@@ -6,12 +6,12 @@ parameters:
 
 
 stages:
-  - stage: PLAN
-    displayName: 'Plan'
+  - stage: Deploy TF
+    displayName: 'Deploying TF to PRD'
     condition: always()
     jobs:
-    - job: Plan
-      displayName: Plan
+    - job: install_terraform
+      displayName: "Installing Terraform"
       steps:
       - checkout: self
       - task: AzureKeyVault@2
@@ -29,9 +29,13 @@ stages:
         displayName: 'Install Terraform'
         inputs:
           terraformVersion: 'latest'
+    
+    - job: terraform_init
+      steps:
       - task: TerraformTaskV4@4
         displayName: 'Terraform Initialize Remote Backend'
         inputs:
+          workingDirectory: Terraform
           provider: 'azurerm'
           command: 'init'
           backendServiceArm: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
@@ -39,20 +43,34 @@ stages:
           backendAzureRmStorageAccountName: 'tfstate2n08y'
           backendAzureRmContainerName: 'tfstate'
           backendAzureRmKey: 'terraform.tfstate'
+   
+    - job: terraform_plan
+      steps:
       - task: TerraformTaskV4@4
-        displayName: 'Terraform plan'
+        displayName: 'Terraform Plan'
         inputs:
           provider: 'azurerm'
           command: 'plan'
+          workingDirectory: Terraform
           environmentServiceNameAzureRM: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
+
+    - job: manual_approval
+      displayName: 'Manual Approval'
+      pool: server
+      steps:
       - task: ManualValidation@0
         inputs:
           notifyUsers: 'jthomas99@gmail.com'
           instructions: 'Review TF plan and approve'
+
+    - job: terraform_apply
+      displayName: "Terraform Apply"
+      steps:
       - task: TerraformTaskV4@4
         displayName: 'Terraform Apply'
         inputs:
           provider: 'azurerm'
           command: 'apply'
+          workingDirectory: Terraform
           commandOptions: '--auto-approve'
           environmentServiceNameAzureRM: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
