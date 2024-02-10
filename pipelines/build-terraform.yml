@@ -6,7 +6,7 @@ parameters:
 
 
 stages:
-  - stage: TF INSTALL and PLAN
+  - stage: PLAN
     displayName: 'Terraform Plan'
     condition: always()
     jobs:
@@ -40,7 +40,7 @@ stages:
           provider: 'azurerm'
           command: 'plan'
           environmentServiceNameAzureRM: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
-  - stage: TF APPLY
+  - stage: APPLY
     displayName: 'Terraform Apply'
     condition: always()
     jobs:
