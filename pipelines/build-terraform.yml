@@ -45,37 +45,14 @@ stages:
           provider: 'azurerm'
           command: 'plan'
           environmentServiceNameAzureRM: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
-  - stage: APPLY
-    displayName: 'Terraform Apply'
-    condition: always()
-    jobs:
-    - deployment: Apply
-      displayName: 'Terraform Apply'
-      pool: Default
+    - deployment: Deploy
+      displayName: Deploy
       environment: Demo
       strategy:
           runOnce:
             deploy:
               steps:
               - checkout: self
-              - task: Bash@3
-                displayName: 'Yum Install Zip'
-                inputs:
-                  targetType: 'inline'
-                  script: sudo apt-get -y install zip
-              - task: TerraformInstaller@1
-                inputs:
-                  terraformVersion: 'latest'
-              - task: TerraformTaskV4@4
-                displayName: 'Terraform Initialize Remote Backend'
-                inputs:
-                  provider: 'azurerm'
-                  command: 'init'
-                  backendServiceArm: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
-                  backendAzureRmResourceGroupName: 'tfstate'
-                  backendAzureRmStorageAccountName: 'tfstate2n08y'
-                  backendAzureRmContainerName: 'tfstate'
-                  backendAzureRmKey: 'terraform.tfstate'
               - task: TerraformTaskV4@4
                 displayName: 'Terraform Apply'
                 inputs:
