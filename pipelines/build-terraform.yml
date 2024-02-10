@@ -19,3 +19,6 @@ stages:
           azureSubscription: 'ado_to_keyvault'
           KeyVaultName: 'MCM-TF-Keys'
           SecretsFilter: '*'
+      - task: TerraformInstaller@1
+        inputs:
+          terraformVersion: 'latest'
