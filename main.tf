@@ -1,4 +1,4 @@
 resource "azurerm_resource_group" "main" {
-  name     = "azuredevops"
+  name     = "customerA"
   location = "northcentralus"
 }
