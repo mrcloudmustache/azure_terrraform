@@ -44,13 +44,25 @@ stages:
     displayName: 'Terraform Apply'
     condition: always()
     jobs:
-    - job: Apply
+    - deployment: Apply
       displayName: 'Terraform Apply'
-      steps:
-      - checkout: self
-      - task: TerraformTaskV4@4
-        inputs:
-          provider: 'azurerm'
-          command: 'apply'
-          commandOptions: '--auto-approve'
-          environmentServiceNameAzureRM: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
+      pool: Default
+      environment: Demo
+      strategy:
+          runOnce:
+            deploy:
+              steps:
+              - checkout: self
+              - task: Bash@3
+                inputs:
+                  targetType: 'inline'
+                  script: sudo apt-get -y install zip
+              - task: TerraformInstaller@1
+                inputs:
+                  terraformVersion: 'latest'
+              - task: TerraformTaskV4@4
+                inputs:
+                  provider: 'azurerm'
+                  command: 'apply'
+                  commandOptions: '--auto-approve'
+                  environmentServiceNameAzureRM: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
