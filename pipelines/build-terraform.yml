@@ -31,11 +31,12 @@ stages:
           terraformVersion: 'latest'
     
     - job: terraform_init
+      displayName:  'Terraform Init'
+      dependsOn: install_terraform
       steps:
       - task: TerraformTaskV4@4
         displayName: 'Terraform Initialize Remote Backend'
         inputs:
-          workingDirectory: Terraform
           provider: 'azurerm'
           command: 'init'
           backendServiceArm: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
@@ -45,6 +46,8 @@ stages:
           backendAzureRmKey: 'terraform.tfstate'
    
     - job: terraform_plan
+      displayName: 'Terraform Plan'
+      dependsOn: terraform_init
       steps:
       - task: TerraformTaskV4@4
         displayName: 'Terraform Plan'
@@ -56,6 +59,7 @@ stages:
 
     - job: manual_approval
       displayName: 'Manual Approval'
+      dependsOn: terraform_plan
       pool: server
       steps:
       - task: ManualValidation@0
@@ -65,12 +69,12 @@ stages:
 
     - job: terraform_apply
       displayName: "Terraform Apply"
+      dependsOn: manual_approval
       steps:
       - task: TerraformTaskV4@4
         displayName: 'Terraform Apply'
         inputs:
           provider: 'azurerm'
           command: 'apply'
-          workingDirectory: Terraform
           commandOptions: '--auto-approve'
           environmentServiceNameAzureRM: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
