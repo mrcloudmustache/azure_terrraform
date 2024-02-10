@@ -34,6 +34,7 @@ stages:
       displayName:  'Terraform Init'
       dependsOn: install_terraform
       steps:
+      - checkout: self
       - task: TerraformTaskV4@4
         displayName: 'Terraform Initialize Remote Backend'
         inputs:
@@ -49,6 +50,7 @@ stages:
       displayName: 'Terraform Plan'
       dependsOn: terraform_init
       steps:
+      - checkout: self
       - task: TerraformTaskV4@4
         displayName: 'Terraform Plan'
         inputs:
@@ -71,6 +73,7 @@ stages:
       displayName: "Terraform Apply"
       dependsOn: manual_approval
       steps:
+      - checkout: self
       - task: TerraformTaskV4@4
         displayName: 'Terraform Apply'
         inputs:
