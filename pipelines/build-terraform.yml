@@ -6,37 +6,27 @@ parameters:
 
 
 stages:
-  - stage: deploy_tf
-    displayName: 'Deploying TF'
+  - stage: build
+    displayName: 'Build'
     condition: always()
     jobs:
-    - job: install_terraform
-      displayName: "Installing Terraform"
+    - job: Build
+      displayName: 'Build: TF Plan'
       steps:
       - checkout: self
       - task: AzureKeyVault@2
-        displayName: 'Get Azure Key Vault Secrets'
         inputs:
           azureSubscription: 'ado_to_keyvault'
           KeyVaultName: 'MCM-TF-Keys'
           SecretsFilter: '*'
       - task: Bash@3
-        displayName: 'Yum Install Zip'
         inputs:
           targetType: 'inline'
           script: sudo apt-get -y install zip
       - task: TerraformInstaller@1
-        displayName: 'Install Terraform'
         inputs:
           terraformVersion: 'latest'
-    
-    - job: terraform_init
-      displayName:  'Terraform Init'
-      dependsOn: install_terraform
-      steps:
-      - checkout: self
       - task: TerraformTaskV4@4
-        displayName: 'Terraform Initialize Remote Backend'
         inputs:
           provider: 'azurerm'
           command: 'init'
@@ -45,39 +35,43 @@ stages:
           backendAzureRmStorageAccountName: 'tfstate2n08y'
           backendAzureRmContainerName: 'tfstate'
           backendAzureRmKey: 'terraform.tfstate'
-   
-    - job: terraform_plan
-      displayName: 'Terraform Plan'
-      dependsOn: terraform_init
-      steps:
-      - checkout: self
       - task: TerraformTaskV4@4
-        displayName: 'Terraform Plan'
         inputs:
           provider: 'azurerm'
           command: 'plan'
-          workingDirectory: Terraform
           environmentServiceNameAzureRM: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
-
-    - job: manual_approval
-      displayName: 'Manual Approval'
-      dependsOn: terraform_plan
-      pool: server
-      steps:
-      - task: ManualValidation@0
-        inputs:
-          notifyUsers: 'jthomas99@gmail.com'
-          instructions: 'Review TF plan and approve'
-
-    - job: terraform_apply
-      displayName: "Terraform Apply"
-      dependsOn: manual_approval
-      steps:
-      - checkout: self
-      - task: TerraformTaskV4@4
-        displayName: 'Terraform Apply'
-        inputs:
-          provider: 'azurerm'
-          command: 'apply'
-          commandOptions: '--auto-approve'
-          environmentServiceNameAzureRM: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
+  - stage: deploy
+    displayName: 'Deploy'
+    condition: always()
+    jobs:
+    - deployment: Deploy
+      displayName: 'Deploy: TF Apply'
+      pool: Default
+      environment: Demo
+      strategy:
+          runOnce:
+            deploy:
+              steps:
+              - checkout: self
+              - task: Bash@3
+                inputs:
+                  targetType: 'inline'
+                  script: sudo apt-get -y install zip
+              - task: TerraformInstaller@1
+                inputs:
+                  terraformVersion: 'latest'
+              - task: TerraformTaskV4@4
+                inputs:
+                  provider: 'azurerm'
+                  command: 'init'
+                  backendServiceArm: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
+                  backendAzureRmResourceGroupName: 'tfstate'
+                  backendAzureRmStorageAccountName: 'tfstate2n08y'
+                  backendAzureRmContainerName: 'tfstate'
+                  backendAzureRmKey: 'terraform.tfstate'
+              - task: TerraformTaskV4@4
+                inputs:
+                  provider: 'azurerm'
+                  command: 'apply'
+                  commandOptions: '--auto-approve'
+                  environmentServiceNameAzureRM: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
