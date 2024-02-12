@@ -48,7 +48,7 @@ stages:
           environmentServiceNameAzureRM: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
   - stage: deploy
     displayName: 'Deploy'
-    condition: eq(stageDependencies.build.terraformPlan.outputs['printvar.changesPresent'], 'true')
+    condition: eq(stageDependencies.build.Build.outputs['terraformPlan.changesPresent'], 'true')
     dependsOn: build
     jobs:
     - deployment: Deploy
