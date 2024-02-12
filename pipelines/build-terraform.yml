@@ -15,18 +15,22 @@ stages:
       steps:
       - checkout: self
       - task: AzureKeyVault@2
+        displayName: 'Get Keyvault Secrets'
         inputs:
           azureSubscription: 'ado_to_keyvault'
           KeyVaultName: 'MCM-TF-Keys'
           SecretsFilter: '*'
       - task: Bash@3
+        displayName: 'APT-GET: install zip'
         inputs:
           targetType: 'inline'
           script: sudo apt-get -y install zip
       - task: TerraformInstaller@1
+        displayName: 'Install Terraform'
         inputs:
           terraformVersion: 'latest'
       - task: TerraformTaskV4@4
+        displayName: 'Terraform: init'
         inputs:
           provider: 'azurerm'
           command: 'init'
@@ -36,6 +40,7 @@ stages:
           backendAzureRmContainerName: 'tfstate'
           backendAzureRmKey: 'terraform.tfstate'
       - task: TerraformTaskV4@4
+        displayName: 'Terraform: plan'
         inputs:
           provider: 'azurerm'
           command: 'plan'
@@ -54,13 +59,16 @@ stages:
               steps:
               - checkout: self
               - task: Bash@3
+                displayName: 'APT-GET: install zip'
                 inputs:
                   targetType: 'inline'
                   script: sudo apt-get -y install zip
               - task: TerraformInstaller@1
+                displayName: 'Install Terraform'
                 inputs:
                   terraformVersion: 'latest'
               - task: TerraformTaskV4@4
+                displayName: 'Terraform: init'
                 inputs:
                   provider: 'azurerm'
                   command: 'init'
@@ -70,6 +78,7 @@ stages:
                   backendAzureRmContainerName: 'tfstate'
                   backendAzureRmKey: 'terraform.tfstate'
               - task: TerraformTaskV4@4
+                displayName: 'Terraform: apply'
                 inputs:
                   provider: 'azurerm'
                   command: 'apply'
