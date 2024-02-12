@@ -40,6 +40,7 @@ stages:
           backendAzureRmContainerName: 'tfstate'
           backendAzureRmKey: 'terraform.tfstate'
       - task: TerraformTaskV4@4
+        name: terraformPlan
         displayName: 'Terraform: plan'
         inputs:
           provider: 'azurerm'
@@ -47,7 +48,7 @@ stages:
           environmentServiceNameAzureRM: 'Azure subscription 1(5fdbca41-d6cf-45c0-8ed0-e213025b7099)'
   - stage: deploy
     displayName: 'Deploy'
-    condition: always()
+    condition: eq(variables['terraformPlan.changesPresent'], 'true')
     jobs:
     - deployment: Deploy
       displayName: 'Deploy: TF Apply'
